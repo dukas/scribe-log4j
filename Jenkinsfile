@@ -14,27 +14,23 @@ pipeline {
     }
     stage('MVN-scribe-client') {
       steps {
-        parallel(
-          "MVN-scribe-client": {
-            withMaven(jdk: 'jdk8', maven: 'Maven3') {
-              sh 'mvn -B clean install -f scribe-client/pom.xml -DautoUpdate=false -DdataDirectory=/opt/dukascopy/jenkins/owasp-data/'
-            }
-            
-            
-          },
-          "MVN-scribe-log4j": {
-            withMaven(jdk: 'jd8', maven: 'Maven3') {
-              sh 'mvn -B clean install -DautoUpdate=false -DdataDirectory=/opt/dukascopy/jenkins/owasp-data/ -f scribe-log4j/pom.xml'
-            }
-            
-            
-          }
-        )
+        withMaven(jdk: 'jdk8', maven: 'Maven3') {
+          sh 'mvn -B clean install -f scribe-client/pom.xml -DautoUpdate=false -DdataDirectory=/opt/dukascopy/jenkins/owasp-data/'
+        }
+        
       }
     }
-    stage('artifacts') {
+    stage('MVN-scribe-log4j') {
       steps {
-        archiveArtifacts(artifacts: '*.jar', fingerprint: true, onlyIfSuccessful: true)
+        withMaven(jdk: 'jdk8', maven: 'Maven3') {
+          sh 'mvn -B clean install -DautoUpdate=false -DdataDirectory=/opt/dukascopy/jenkins/owasp-data/ -f scribe-log4j/pom.xml'
+        }
+        
+      }
+    }
+    stage('Artifacts') {
+      steps {
+        archiveArtifacts '**/*.jar'
       }
     }
   }
