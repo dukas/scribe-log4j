@@ -15,7 +15,7 @@ pipeline {
     stage('MVN') {
       steps {
         withMaven(jdk: 'jdk8', maven: 'Maven3') {
-          sh 'mvn -B clean install -DautoUpdate=false -DdataDirectory=/opt/dukascopy/jenkins/owasp-data/'
+          sh 'mvn -B clean install -f scribe-client/pom.xml -DautoUpdate=false -DdataDirectory=/opt/dukascopy/jenkins/owasp-data/'
         }
         
       }
