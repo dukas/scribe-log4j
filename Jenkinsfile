@@ -12,12 +12,24 @@ pipeline {
         tool(name: 'jdk8', type: 'jdk')
       }
     }
-    stage('MVN') {
+    stage('MVN-scribe-client') {
       steps {
-        withMaven(jdk: 'jdk8', maven: 'Maven3') {
-          sh 'mvn -B clean install -f scribe-client/pom.xml -DautoUpdate=false -DdataDirectory=/opt/dukascopy/jenkins/owasp-data/'
-        }
-        
+        parallel(
+          "MVN-scribe-client": {
+            withMaven(jdk: 'jdk8', maven: 'Maven3') {
+              sh 'mvn -B clean install -f scribe-client/pom.xml -DautoUpdate=false -DdataDirectory=/opt/dukascopy/jenkins/owasp-data/'
+            }
+            
+            
+          },
+          "MVN-scribe-log4j": {
+            withMaven(jdk: 'jd8', maven: 'Maven3') {
+              sh 'mvn -B clean install -DautoUpdate=false -DdataDirectory=/opt/dukascopy/jenkins/owasp-data/ -f scribe-log4j/pom.xml'
+            }
+            
+            
+          }
+        )
       }
     }
     stage('artifacts') {
